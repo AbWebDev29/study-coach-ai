@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './App.css';
 
+const BACKEND_URL = 'http://localhost:4000'; // or your deployed URL
+
 function App() {
   const [analyzing, setAnalyzing] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
@@ -28,6 +30,7 @@ function App() {
     }, 800);
   };
 
+  // ✅ NEW: Azure‑powered PDF upload
   const handlePdfUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -36,83 +39,47 @@ function App() {
     setResult(null);
     setChatMessages([]);
 
-    setTimeout(() => {
-      const filename = file.name.toLowerCase();
-      
-      // ✅ FULL 7-DAY PLANS FOR EVERY PDF
-      let topics = [];
-      let course = 'Custom Syllabus';
-      let sevenDayPlan = [];
-      
-      if (filename.includes('dsa') || filename.includes('data') || filename.includes('cs3201')) {
-        topics = ['Arrays', 'Linked Lists', 'Trees', 'Graphs', 'Sorting', 'Dynamic Programming'];
-        course = 'CS3201 Data Structures';
-        sevenDayPlan = [
-          'Day 1: Arrays + Strings (GFG Easy)',
-          'Day 2: Linked Lists + Stacks (LeetCode)',
-          'Day 3: Trees + BFS/DFS (Medium)',
-          'Day 4: Graphs + Dijkstra (GFG)',
-          'Day 5: Sorting + Searching',
-          'Day 6: Dynamic Programming',
-          'Day 7: Mock Test + Revision'
-        ];
-      } else if (filename.includes('os') || filename.includes('operating') || filename.includes('cs3202')) {
-        topics = ['Processes', 'CPU Scheduling', 'Deadlock', 'Memory Management', 'File Systems'];
-        course = 'CS3202 Operating Systems';
-        sevenDayPlan = [
-          'Day 1: Processes + Threads',
-          'Day 2: CPU Scheduling (RR, SJF)',
-          'Day 3: Deadlock Prevention',
-          'Day 4: Memory Management',
-          'Day 5: Virtual Memory',
-          'Day 6: File Systems',
-          'Day 7: Practice + VIT Internals'
-        ];
-      } else if (filename.includes('cn') || filename.includes('network') || filename.includes('cs3203')) {
-        topics = ['OSI Model', 'TCP/IP', 'Routing', 'HTTP/DNS', 'Wireshark'];
-        course = 'CS3203 Computer Networks';
-        sevenDayPlan = [
-          'Day 1: OSI Model + TCP/IP',
-          'Day 2: IP Addressing + Subnetting',
-          'Day 3: TCP/UDP + Sockets',
-          'Day 4: Routing Protocols',
-          'Day 5: Application Layer',
-          'Day 6: Wireshark Analysis',
-          'Day 7: NS3 Simulation'
-        ];
-      } else {
-        // ✅ CUSTOM 7-DAY PLAN from filename
-        const fileBase = filename.split('.')[0].replace(/-/g, ' ').replace(/_/g, ' ').split(' ')[0];
-        const topicName = fileBase.charAt(0).toUpperCase() + fileBase.slice(1);
-        topics = [
-          `${topicName} Basics`,
-          `${topicName} Core Concepts`,
-          `${topicName} Algorithms`,
-          `${topicName} Implementation`,
-          `${topicName} Advanced`,
-          `${topicName} Applications`,
-          `${topicName} Practice`
-        ];
-        course = `${topicName} (${topics.length} units)`;
-        sevenDayPlan = topics.map((topic, i) => `Day ${i+1}: ${topic}`);
-      }
-      
-      const analysisResult = {
-        pages: Math.floor(Math.random()*25)+8,
+    const formData = new FormData();
+    formData.append('pdf', file);
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/analyze-pdf`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!data.success) throw new Error(data.error || 'Analysis failed');
+
+      // Build message from Azure result
+      setResult({
+        pages: data.pages,
+        syllabusPreview: data.syllabusPreview,
+        studyPlan: data.studyPlan,
         filename: file.name,
-        courseName: course,
-        topics: topics,
-        sevenDayPlan: sevenDayPlan,
-        topicCount: topics.length
-      };
-      
-      setResult(analysisResult);
-      setChatMessages([{ 
-        role: 'assistant', 
-        content: `✅ **PDF ANALYSIS COMPLETE!** (${analysisResult.pages} pages)\n\n📄 **FILE:** ${file.name}\n📚 **COURSE:** ${course}\n\n📖 **TOPICS (${topics.length}):**\n${topics.slice(0,3).map(t => `• ${t}`).join('\n')}${topics.length > 3 ? `\n• ... +${topics.length-3} more` : ''}\n\n📅 **COMPLETE 7-DAY PLAN:**\n${sevenDayPlan.join('\n')}\n\n💡 **Ready to study?** Ask about any day/topic!` 
-      }]);
+      });
+
+      setChatMessages([
+        {
+          role: 'assistant',
+          content:
+            `✅ **Azure PDF ANALYSIS COMPLETE** (${data.pages} pages)\n\n` +
+            `📄 **File:** ${file.name}\n\n` +
+            `📖 **Syllabus preview:**\n${data.syllabusPreview}\n\n` +
+            `📅 **7‑DAY STUDY PLAN (from Azure OpenAI):**\n${data.studyPlan}`,
+        },
+      ]);
+    } catch (err) {
+      setChatMessages([
+        {
+          role: 'assistant',
+          content: `❌ Error analyzing PDF: ${err.message}`,
+        },
+      ]);
+    } finally {
       setAnalyzing(false);
-    }, 3500);
+    }
   };
 
   const clearChat = () => {
@@ -263,11 +230,19 @@ function App() {
           background: 'rgba(255,255,255,0.05)', padding: '25px', borderRadius: '20px'
         }}>
           {result && (
-            <div style={{ marginBottom: '20px', textAlign: 'center', color: '#00bc77' }}>
-              <h3>✅ {result.courseName}</h3>
-              <p><strong>{result.filename}</strong> | {result.pages} pages | {result.topicCount} topics</p>
-            </div>
-          )}
+  <div className="result-card">
+    <p><strong>✅ Azure PDF ANALYSIS COMPLETE</strong> ({result.pages} pages)</p>
+    <p><strong>📄 File:</strong> {result.filename}</p>
+
+    <p><strong>📖 Syllabus preview:</strong></p>
+<p>{result.syllabusPreview}</p>
+
+
+    <p><strong>📅 7-DAY STUDY PLAN (from Azure OpenAI):</strong></p>
+    <p>{result.studyPlan || 'Ask in the chat box above to get a day‑wise plan.'}</p>
+  </div>
+)}
+
           
           {chatMessages.map((msg, idx) => (
             <div key={idx} style={{
@@ -289,13 +264,13 @@ function App() {
           {analyzing && (
             <div style={{ textAlign: 'center', color: '#00bc77' }}>
               <div style={{ fontSize: '24px', marginBottom: '10px' }}>🔄</div>
-              <p>AI reading PDF → Extracting topics → Building COMPLETE 7-day plan...</p>
+              <p>AI reading PDF → Extracting syllabus → Building COMPLETE 7-day plan...</p>
             </div>
           )}
         </div>
 
         <div style={{ marginTop: '30px', textAlign: 'center', fontSize: '12px', color: '#888' }}>
-          <p>⚡ VIT BTech CS | Imagine Cup 2025 | DAY 5 COMPLETE! 🚀</p>
+          <p>⚡ VIT BTech CS | Imagine Cup 2025 | DAY 6 Azure Backend LIVE! 🚀</p>
         </div>
       </header>
     </div>
