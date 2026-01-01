@@ -10,14 +10,15 @@
   },
   "dependencies": {
     "@azure/openai": "^1.0.0-beta",
+    "axios": "^1.13.2",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
     "form-data": "^4.0.5",
+    "fs": "^0.0.1-security",
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^3.3.2",
-    "openai": "^6.15.0",
-    "pdf-page-counter": "^1.0.3"
+    "openai": "^6.15.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
