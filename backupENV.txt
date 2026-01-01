@@ -1,0 +1,11 @@
+backend
+OPENAI_KEY=D6S0Vl5kcvsEt3hpR8wIEQWtdL33FoQ6dPFZuQtEZQc02G0r2zKXJQQJ99BLACHYHv6XJ3w3AAABACOGjYrW
+OPENAI_ENDPOINT=https://studycoach-openai.openai.azure.com
+OPENAI_DEPLOYMENT=study-coach-gpt
+DOC_INTELLIGENCE_ENDPOINT=https://studycoach-docintel.cognitiveservices.azure.com
+DOC_INTELLIGENCE_KEY=FRfOurdhShgZmwkJPY3Wcd1P84qdjhP3PqK7LT9gtBGPlW71qpylJQQJ99BLACGhslBXJ3w3AAALACOGasv8
+DOC_INTELLIGENCE_MODEL=prebuilt-layout
+PORT=4000
+
+frontend
+REACT_APP_BACKEND_URL=http://localhost:4000       
