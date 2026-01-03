@@ -9,26 +9,36 @@ function App() {
   const [userInput, setUserInput] = useState('');
   const [result, setResult] = useState(null);
 
-  const handleSendMessage = () => {
-    if (!userInput.trim()) return;
-    
-    const newMessages = [...chatMessages, {role: 'user', content: userInput}];
-    setChatMessages(newMessages);
-    setUserInput('');
-    
-    setTimeout(() => {
-      let response = '';
-      if (userInput.toLowerCase().includes('dijkstra')) {
-        response = `🔍 **Dijkstra's Algorithm**\n\n**Time:** O((V+E)logV)\n**Space:** O(V)\n\n**Day 4 Priority** (Graphs)\n**VIT CS3201 Ch.8**\n**Practice:** GFG + LeetCode 743`;
-      } else if (userInput.toLowerCase().includes('deadlock')) {
-        response = `🔒 **OS Deadlock** (CS3202):\n\n**4 Conditions:**\n• Mutual Exclusion\n• Hold & Wait\n• No Preemption\n• Circular Wait\n\n**Prevention:** Resource ordering\n**Day 3 Priority**`;
-      } else {
-        response = `💡 **${userInput}** → Perfect Day 3 question!\n\n• **Resource:** GeeksforGeeks\n• **Time:** 45 mins practice\n• **VIT Notes:** Check Ch.4-5`;
-      }
-      
-      setChatMessages([...newMessages, { role: 'assistant', content: response }]);
-    }, 800);
-  };
+  const handleSendMessage = async () => {
+  if (!userInput.trim()) return;
+
+  const newMessages = [...chatMessages, { role: 'user', content: userInput }];
+  setChatMessages(newMessages);
+  const question = userInput;
+  setUserInput('');
+
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/chat-course`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question }),
+    });
+
+    const data = await res.json();
+    const answer = data.answer || 'No answer generated.';
+
+    setChatMessages([
+      ...newMessages,
+      { role: 'assistant', content: answer },
+    ]);
+  } catch (err) {
+    setChatMessages([
+      ...newMessages,
+      { role: 'assistant', content: `Error in chat: ${err.message}` },
+    ]);
+  }
+};
+
 
   // ✅ NEW: Azure‑powered PDF upload
   const handlePdfUpload = async (e) => {
