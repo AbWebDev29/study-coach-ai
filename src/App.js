@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 
-const BACKEND_URL = 'http://localhost:4000'; // or your deployed URL
+const BACKEND_URL = 'https://study-coach-ai-backend.onrender.com'; // or your deployed URL
 
 function App() {
   const [analyzing, setAnalyzing] = useState(false);
