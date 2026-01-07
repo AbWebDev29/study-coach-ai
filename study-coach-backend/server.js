@@ -251,17 +251,3 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Backend running locally on http://localhost:${PORT}`);
 });
-const cors = require('cors');
-
-const allowedOrigins = [
-  'https://study-coach-ai-ashy.vercel.app',
-  'http://localhost:3000'
-];
-
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
-  credentials: false
-}));
-
