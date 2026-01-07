@@ -1,10 +1,5 @@
 // server.js
 require('dotenv').config();
-console.log('OpenAI env check:', {
-  endpoint: process.env.AZURE_OPENAI_ENDPOINT,
-  deployment: process.env.AZURE_OPENAI_DEPLOYMENT,
-  hasKey: !!process.env.AZURE_OPENAI_API_KEY,
-});
 
 
 const express = require('express');
@@ -12,8 +7,15 @@ const cors = require('cors');
 const multer = require('multer');
 const fs = require('fs');
 const axios = require('axios');
+const upload = multer({ storage: multer.memoryStorage() });
 
 const app = express();
+
+app.post('/api/analyze-pdf', upload.single('pdf'), async (req, res) => {
+  const fileBuffer = req.file.buffer;   // 👈 use buffer, not path
+  // send fileBuffer to Azure Doc Intelligence here
+});
+module.exports = app;
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
@@ -23,8 +25,6 @@ let lastCourseContext = null;
 // ---------- Upload setup ----------
 const uploadDir = 'uploads';
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
-const upload = multer({ dest: uploadDir });
-
 // ---------- Health route ----------
 app.get('/api/chat', (req, res) => {
   res.json({

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import './App.css';
 
-const BACKEND_URL = 'http://localhost:4000'; // or your deployed URL
+
+const BACKEND_URL = 'https://study-coach-qasumeydp-anvibansal2006-4244s-projects.vercel.app';
+
 
 function App() {
   const [analyzing, setAnalyzing] = useState(false);
