@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 
-const BACKEND_URL = 'https://study-coach-ai-backend.vercel.app/';
+const BACKEND_URL = 'https://study-coach-ai-backend.vercel.app';
 
 function App() {
   const [analyzing, setAnalyzing] = useState(false);
@@ -16,7 +16,8 @@ function App() {
   setChatMessages(newMessages);
   const question = userInput;
   setUserInput('');
-
+  fetch(`${BACKEND_URL}/api/analyze-pdf`, { method: 'POST', body: formData });
+ 
   try {
     const res = await fetch(`${BACKEND_URL}/api/chat-course`, {
       method: 'POST',
