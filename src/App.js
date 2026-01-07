@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import './App.css';
 
-
-const BACKEND_URL = 'https://study-coach-qasumeydp-anvibansal2006-4244s-projects.vercel.app';
-
+const BACKEND_URL = 'https://study-coach-ai-ashy.vercel.app';
 
 function App() {
   const [analyzing, setAnalyzing] = useState(false);
